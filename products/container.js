@@ -45,10 +45,13 @@ class Container {
             throw new Error(`Error: ${err}`)
         }
     }
-    async getAll() {
+    async getAll(limit) {
         try{
             const getContent = await fs.promises.readFile(`${this.fileToWork}`,);
             const content = JSON.parse(getContent); 
+            if(limit & limit<=content.length){
+                content = content[0,limit];
+            }
             return content
         }
         catch(err){

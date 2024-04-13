@@ -4,22 +4,34 @@ const Container = require('./products/container.js');
 const productContainer = new Container('./products/products.json');
 
 app.get('/', (req, res) => {
-    res.redirect('/products')
+    try {
+        res.redirect('/products');   
+    } catch (error) {
+        console.log(error);
+        return res.json({status: 500, response: error.message})
+    }
 })
 
 app.get('/products', async (req, res) => {
-    const allProducts = await productContainer.getAll();
-    res.json(allProducts);
+    try {
+            const limit = req.query || null ;
+            const allProducts = await productContainer.getAll(limit);
+            return res.json(allProducts);
+    }        
+    catch (error) {
+        console.log(error);
+        return res.json({status: 500, response: error.message})
+    }
 });
 
-app.get('/randomProduct', async (req, res) => {
-    const allProducts = await productContainer.getAll();
-    let randomId = Math.floor(Math.random() * allProducts.length) +1;
-    const randomProduct = await productContainer.getById(randomId)
-    res.json(randomProduct)
+app.get('/products/:pid', async (req, res) => {
+    const pid = req.params;
+    const randomProduct = await productContainer.getById(pid);
+    res.json(randomProduct);
 });
 
-const server = app.listen(8080, () => {
-    console.log(`Servidor inicializado en el puerto ${server.address().port}`)
-});
+const port = 8080;
+const ready = console.log(`Servidor inicializado en el puerto ${port}`);
+
+const server = app.listen(port,ready);
 server.on("error", err => console.log(`Error en el servidor: ${err}`));
